@@ -1,0 +1,703 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - HETROFL System{% endblock %}
+
+{% block content %}
+<div id="alert-container"></div>
+
+<div class="row mt-3">
+    <!-- System Overview -->
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-tachometer-alt me-2"></i>
+                    System Overview
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <!-- Global Model Status -->
+                    <div class="col-md-3">
+                        <div class="metric-card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                            <div class="metric-value" id="global-accuracy">--</div>
+                            <div class="metric-label">Global Model Accuracy</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Training Progress -->
+                    <div class="col-md-3">
+                        <div class="metric-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                            <div class="metric-value" id="training-round">--</div>
+                            <div class="metric-label">Current Round</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Local Models -->
+                    <div class="col-md-3">
+                        <div class="metric-card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                            <div class="metric-value" id="local-models-count">--</div>
+                            <div class="metric-label">Local Models</div>
+                        </div>
+                    </div>
+                    
+                    <!-- System Status -->
+                    <div class="col-md-3">
+                        <div class="metric-card" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+                            <div class="metric-value" id="system-uptime">--</div>
+                            <div class="metric-label">System Status</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <!-- Real-time Performance Chart -->
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-chart-line me-2"></i>
+                    Real-time Performance
+                </h5>
+            </div>
+            <div class="card-body">
+                <div id="performance-chart" style="height: 400px;"></div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Training Controls -->
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-play me-2"></i>
+                    Training Controls
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label for="sample-size" class="form-label">Sample Size</label>
+                    <input type="number" class="form-control" id="sample-size" value="50000" min="1000" max="1000000">
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label">Training Progress</label>
+                    <div class="progress mb-2">
+                        <div class="progress-bar" id="training-progress" role="progressbar" style="width: 0%"></div>
+                    </div>
+                    <small class="text-muted" id="progress-text">Ready to start</small>
+                </div>
+                
+                <div class="d-grid gap-2">
+                    <button class="btn btn-success" id="start-training-btn" onclick="startTraining()">
+                        <i class="fas fa-play me-2"></i>Start Training
+                    </button>
+                    <button class="btn btn-danger" id="stop-training-btn" onclick="stopTraining()" disabled>
+                        <i class="fas fa-stop me-2"></i>Stop Training
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Quick Stats -->
+        <div class="card mt-3">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Quick Stats
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-6">
+                        <h4 class="text-primary" id="total-rounds">0</h4>
+                        <small class="text-muted">Total Rounds</small>
+                    </div>
+                    <div class="col-6">
+                        <h4 class="text-success" id="best-accuracy">0%</h4>
+                        <small class="text-muted">Best Accuracy</small>
+                    </div>
+                </div>
+                <hr>
+                <div class="row text-center">
+                    <div class="col-6">
+                        <h4 class="text-warning" id="avg-round-time">0s</h4>
+                        <small class="text-muted">Avg Round Time</small>
+                    </div>
+                    <div class="col-6">
+                        <h4 class="text-info" id="improvement">0%</h4>
+                        <small class="text-muted">Improvement</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <!-- Model Comparison -->
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-balance-scale me-2"></i>
+                    Model Comparison
+                </h5>
+            </div>
+            <div class="card-body">
+                <div id="comparison-chart" style="height: 300px;"></div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Recent Activity -->
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-history me-2"></i>
+                    Recent Activity
+                </h5>
+            </div>
+            <div class="card-body">
+                <div id="activity-log" style="height: 300px; overflow-y: auto;">
+                    <div class="text-center text-muted">
+                        <i class="fas fa-clock fa-2x mb-2"></i>
+                        <p>No recent activity</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <!-- Local Models Status -->
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-brain me-2"></i>
+                    Local Models Status
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Model</th>
+                                <th>Type</th>
+                                <th>Status</th>
+                                <th>Accuracy</th>
+                                <th>F1 Score</th>
+                                <th>Last Updated</th>
+                            </tr>
+                        </thead>
+                        <tbody id="models-table-body">
+                            <tr>
+                                <td colspan="6" class="text-center text-muted">Loading models...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Dashboard-specific variables
+    let performanceChart = null;
+    let comparisonChart = null;
+    let activityLog = [];
+    let metricsHistory = {global: [], local: {}};
+    
+    // Initialize dashboard
+    document.addEventListener('DOMContentLoaded', function() {
+        initializeCharts();
+        loadInitialData();
+    });
+    
+    // Initialize charts with proper error handling
+    function initializeCharts() {
+        // Performance chart
+        const performanceLayout = {
+            title: 'Real-time Performance',
+            xaxis: { title: 'Round' },
+            yaxis: { title: 'Accuracy (%)' },
+            autosize: true,
+            margin: { l: 50, r: 50, t: 50, b: 50 },
+            showlegend: true
+        };
+        
+        const emptyTrace = [{
+            x: [0],
+            y: [0],
+            type: 'scatter',
+            mode: 'lines+markers',
+            name: 'Waiting for data...',
+            line: { color: '#3498db' }
+        }];
+        
+        Plotly.newPlot('performance-chart', emptyTrace, performanceLayout);
+        
+        // Comparison chart
+        const comparisonLayout = {
+            title: 'Model Comparison',
+            xaxis: { title: 'Models' },
+            yaxis: { title: 'Accuracy (%)' },
+            autosize: true,
+            margin: { l: 50, r: 50, t: 50, b: 50 }
+        };
+        
+        const emptyBarTrace = [{
+            x: ['No Data'],
+            y: [0],
+            type: 'bar',
+            name: 'Accuracy',
+            marker: { color: '#3498db' }
+        }];
+        
+        Plotly.newPlot('comparison-chart', emptyBarTrace, comparisonLayout);
+    }
+    
+    // Load initial data
+    function loadInitialData() {
+        fetch('/api/models/info')
+            .then(response => response.json())
+            .then(data => {
+                if (!data.error) {
+                    updateModelsTable(data);
+                }
+            })
+            .catch(error => console.error('Error loading models info:', error));
+        
+        fetch('/api/metrics/latest')
+            .then(response => response.json())
+            .then(data => {
+                if (!data.error) {
+                    updateMetrics(data);
+                }
+            })
+            .catch(error => console.error('Error loading metrics:', error));
+    }
+    
+    // Update metrics (called from base.html)
+    function updateMetrics(data) {
+        if (data.error) return;
+        
+        // Update global metrics
+        if (data.global && Object.keys(data.global).length > 0) {
+            document.getElementById('global-accuracy').textContent = 
+                formatPercentage(data.global.accuracy || 0);
+        }
+        
+        // Update local models count
+        const localCount = Object.keys(data.local || {}).length;
+        document.getElementById('local-models-count').textContent = localCount;
+        
+        // Update comparison chart with latest metrics
+        updateComparisonChart(data);
+        
+        // Load history data for performance chart
+        fetch('/api/metrics/history')
+            .then(response => response.json())
+            .then(historyData => {
+                if (!historyData.error) {
+                    updatePerformanceChart(historyData);
+                }
+            })
+            .catch(error => console.error('Error loading metrics history:', error));
+        
+        // Update models table
+        updateModelsTableMetrics(data);
+    }
+    
+    // Update results (called from base.html)
+    function updateResults(data) {
+        if (data.error || !data.round) return;
+        
+        // Update training round
+        document.getElementById('training-round').textContent = data.round;
+        
+        // Update progress
+        if (systemStatus.training) {
+            const progress = (data.round / systemStatus.total_rounds) * 100;
+            document.getElementById('training-progress').style.width = progress + '%';
+            document.getElementById('progress-text').textContent = 
+                `Round ${data.round} of ${systemStatus.total_rounds}`;
+        }
+        
+        // Add to activity log
+        addActivityLogEntry(`Round ${data.round} completed`, 'success');
+        
+        // Update quick stats
+        updateQuickStats(data);
+    }
+    
+    // Update performance chart with real data
+    function updatePerformanceChart(data) {
+        try {
+            const traces = [];
+            
+            // Global model trace
+            if (data.global && Array.isArray(data.global) && data.global.length > 0) {
+                const globalTrace = {
+                    x: data.global.map((_, index) => index + 1),
+                    y: data.global.map(entry => (entry.accuracy || 0) * 100),
+                    type: 'scatter',
+                    mode: 'lines+markers',
+                    name: 'Global Model',
+                    line: { color: '#3498db', width: 3 },
+                    marker: { size: 6 }
+                };
+                traces.push(globalTrace);
+            }
+            
+            // Local model traces
+            if (data.local && typeof data.local === 'object') {
+                const colors = ['#e74c3c', '#27ae60', '#f39c12', '#9b59b6'];
+                let colorIndex = 0;
+                
+                Object.entries(data.local).forEach(([modelName, history]) => {
+                    if (Array.isArray(history) && history.length > 0) {
+                        const localTrace = {
+                            x: history.map((_, index) => index + 1),
+                            y: history.map(entry => (entry.accuracy || 0) * 100),
+                            type: 'scatter',
+                            mode: 'lines+markers',
+                            name: modelName.replace('_', ' ').toUpperCase(),
+                            line: { color: colors[colorIndex % colors.length], width: 2 },
+                            marker: { size: 5 }
+                        };
+                        traces.push(localTrace);
+                        colorIndex++;
+                    }
+                });
+            }
+            
+            // If no traces, show placeholder
+            if (traces.length === 0) {
+                traces.push({
+                    x: [0],
+                    y: [0],
+                    type: 'scatter',
+                    mode: 'lines+markers',
+                    name: 'No training data yet',
+                    line: { color: '#95a5a6' }
+                });
+            }
+            
+            const layout = {
+                title: 'Real-time Performance',
+                xaxis: { title: 'Training Round' },
+                yaxis: { title: 'Accuracy (%)', range: [0, 100] },
+                autosize: true,
+                margin: { l: 50, r: 50, t: 50, b: 50 },
+                showlegend: true,
+                hovermode: 'x unified'
+            };
+            
+            Plotly.react('performance-chart', traces, layout);
+        } catch (error) {
+            console.error('Error updating performance chart:', error);
+            addActivityLogEntry('Error updating performance chart: ' + error.message, 'error');
+        }
+    }
+    
+    // Update comparison chart with latest metrics
+    function updateComparisonChart(latestMetrics) {
+        try {
+            const models = [];
+            const accuracies = [];
+            const f1Scores = [];
+            const colors = ['#3498db', '#e74c3c', '#27ae60', '#f39c12', '#9b59b6'];
+            
+            // Global model
+            if (latestMetrics.global && latestMetrics.global.accuracy !== undefined) {
+                models.push('Global Model');
+                accuracies.push((latestMetrics.global.accuracy || 0) * 100);
+                f1Scores.push((latestMetrics.global.f1_score || 0) * 100);
+            }
+            
+            // Local models
+            if (latestMetrics.local && typeof latestMetrics.local === 'object') {
+                Object.entries(latestMetrics.local).forEach(([modelName, metrics]) => {
+                    if (metrics && metrics.accuracy !== undefined) {
+                        models.push(modelName.replace('_', ' ').toUpperCase());
+                        accuracies.push((metrics.accuracy || 0) * 100);
+                        f1Scores.push((metrics.f1_score || 0) * 100);
+                    }
+                });
+            }
+            
+            // If no data, show placeholder
+            if (models.length === 0) {
+                models.push('No Data');
+                accuracies.push(0);
+                f1Scores.push(0);
+            }
+            
+            const traces = [
+                {
+                    x: models,
+                    y: accuracies,
+                    type: 'bar',
+                    name: 'Accuracy (%)',
+                    marker: { color: colors[0] },
+                    text: accuracies.map(acc => acc.toFixed(1) + '%'),
+                    textposition: 'auto'
+                },
+                {
+                    x: models,
+                    y: f1Scores,
+                    type: 'bar',
+                    name: 'F1-Score (%)',
+                    marker: { color: colors[1] },
+                    text: f1Scores.map(f1 => f1.toFixed(1) + '%'),
+                    textposition: 'auto'
+                }
+            ];
+            
+            const layout = {
+                title: 'Model Performance Comparison',
+                xaxis: { title: 'Models' },
+                yaxis: { title: 'Performance (%)', range: [0, 100] },
+                autosize: true,
+                margin: { l: 50, r: 50, t: 50, b: 50 },
+                barmode: 'group',
+                hovermode: 'x unified'
+            };
+            
+            Plotly.react('comparison-chart', traces, layout);
+        } catch (error) {
+            console.error('Error updating comparison chart:', error);
+            addActivityLogEntry('Error updating comparison chart: ' + error.message, 'error');
+        }
+    }
+    
+    // Update models table
+    function updateModelsTable(modelsInfo) {
+        const tbody = document.getElementById('models-table-body');
+        let html = '';
+        
+        // Local models
+        Object.entries(modelsInfo.local_models || {}).forEach(([name, info]) => {
+            const statusBadge = info.is_loaded ? 
+                '<span class="badge bg-success">Loaded</span>' : 
+                '<span class="badge bg-danger">Not Loaded</span>';
+            
+            html += `
+                <tr>
+                    <td><strong>${name}</strong></td>
+                    <td>${info.type}</td>
+                    <td>${statusBadge}</td>
+                    <td id="accuracy-${name}">--</td>
+                    <td id="f1-${name}">--</td>
+                    <td id="updated-${name}">--</td>
+                </tr>
+            `;
+        });
+        
+        // Global model
+        if (modelsInfo.global_model && Object.keys(modelsInfo.global_model).length > 0) {
+            const globalInfo = modelsInfo.global_model;
+            const statusBadge = globalInfo.status === 'trained' ? 
+                '<span class="badge bg-success">Trained</span>' : 
+                '<span class="badge bg-warning">Built</span>';
+            
+            html += `
+                <tr class="table-primary">
+                    <td><strong>Global MLP</strong></td>
+                    <td>Neural Network</td>
+                    <td>${statusBadge}</td>
+                    <td id="accuracy-global">--</td>
+                    <td id="f1-global">--</td>
+                    <td id="updated-global">--</td>
+                </tr>
+            `;
+        }
+        
+        tbody.innerHTML = html;
+    }
+    
+    // Update models table with metrics
+    function updateModelsTableMetrics(data) {
+        // Update local models
+        Object.entries(data.local || {}).forEach(([name, metrics]) => {
+            if (Object.keys(metrics).length > 0) {
+                const accuracyEl = document.getElementById(`accuracy-${name}`);
+                const f1El = document.getElementById(`f1-${name}`);
+                const updatedEl = document.getElementById(`updated-${name}`);
+                
+                if (accuracyEl) accuracyEl.textContent = formatPercentage(metrics.accuracy);
+                if (f1El) f1El.textContent = formatPercentage(metrics.f1_score);
+                if (updatedEl) updatedEl.textContent = new Date(metrics.timestamp).toLocaleTimeString();
+            }
+        });
+        
+        // Update global model
+        if (data.global && Object.keys(data.global).length > 0) {
+            const accuracyEl = document.getElementById('accuracy-global');
+            const f1El = document.getElementById('f1-global');
+            const updatedEl = document.getElementById('updated-global');
+            
+            if (accuracyEl) accuracyEl.textContent = formatPercentage(data.global.accuracy);
+            if (f1El) f1El.textContent = formatPercentage(data.global.f1_score);
+            if (updatedEl) updatedEl.textContent = new Date(data.global.timestamp).toLocaleTimeString();
+        }
+    }
+    
+    // Update quick stats
+    function updateQuickStats(data) {
+        if (data.round) {
+            document.getElementById('total-rounds').textContent = data.round;
+        }
+        
+        // Calculate best accuracy from global metrics
+        if (data.global_metrics && data.global_metrics.accuracy) {
+            document.getElementById('best-accuracy').textContent = 
+                formatPercentage(data.global_metrics.accuracy);
+        }
+        
+        // Calculate average round time
+        if (data.round_time) {
+            document.getElementById('avg-round-time').textContent = 
+                formatTime(data.round_time);
+        }
+        
+        // Calculate improvement
+        fetch('/api/metrics/improvements')
+            .then(response => response.json())
+            .then(improvementData => {
+                if (!improvementData.error && improvementData.global && improvementData.global.accuracy_improvement) {
+                    document.getElementById('improvement').textContent = 
+                        formatNumber(improvementData.global.accuracy_improvement, 1) + '%';
+                }
+            })
+            .catch(error => console.error('Error loading improvements:', error));
+    }
+    
+    // Add activity log entry
+    function addActivityLogEntry(message, type = 'info') {
+        const timestamp = new Date().toLocaleTimeString();
+        const iconClass = type === 'success' ? 'fa-check-circle text-success' : 
+                         type === 'error' ? 'fa-exclamation-circle text-danger' : 
+                         'fa-info-circle text-info';
+        
+        const entry = `
+            <div class="d-flex align-items-center mb-2">
+                <i class="fas ${iconClass} me-2"></i>
+                <div class="flex-grow-1">
+                    <small class="text-muted">${timestamp}</small>
+                    <div>${message}</div>
+                </div>
+            </div>
+        `;
+        
+        const logContainer = document.getElementById('activity-log');
+        
+        // Remove "no activity" message if present
+        if (logContainer.querySelector('.text-center')) {
+            logContainer.innerHTML = '';
+        }
+        
+        logContainer.insertAdjacentHTML('afterbegin', entry);
+        
+        // Keep only last 10 entries
+        const entries = logContainer.querySelectorAll('.d-flex');
+        if (entries.length > 10) {
+            entries[entries.length - 1].remove();
+        }
+    }
+    
+    // Training control functions
+    function startTraining() {
+        const sampleSize = parseInt(document.getElementById('sample-size').value);
+        
+        showLoading('Starting federated training...');
+        
+        fetch('/api/training/start', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                sample_size: sampleSize
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            hideLoading();
+            
+            if (data.error) {
+                showAlert('Error starting training: ' + data.error, 'danger');
+            } else {
+                showAlert('Federated training started successfully!', 'success');
+                document.getElementById('start-training-btn').disabled = true;
+                document.getElementById('stop-training-btn').disabled = false;
+                addActivityLogEntry('Federated training started', 'success');
+            }
+        })
+        .catch(error => {
+            hideLoading();
+            showAlert('Error starting training: ' + error.message, 'danger');
+        });
+    }
+    
+    function stopTraining() {
+        showLoading('Stopping training...');
+        
+        fetch('/api/training/stop', {
+            method: 'POST'
+        })
+        .then(response => response.json())
+        .then(data => {
+            hideLoading();
+            
+            if (data.error) {
+                showAlert('Error stopping training: ' + data.error, 'danger');
+            } else {
+                showAlert('Training stopped successfully!', 'warning');
+                document.getElementById('start-training-btn').disabled = false;
+                document.getElementById('stop-training-btn').disabled = true;
+                document.getElementById('training-progress').style.width = '0%';
+                document.getElementById('progress-text').textContent = 'Training stopped';
+                addActivityLogEntry('Training stopped by user', 'info');
+            }
+        })
+        .catch(error => {
+            hideLoading();
+            showAlert('Error stopping training: ' + error.message, 'danger');
+        });
+    }
+    
+    // Update system status display
+    function updateSystemStatus(status) {
+        // Call parent function
+        window.updateSystemStatus(status);
+        
+        // Update training controls
+        if (status.training) {
+            document.getElementById('start-training-btn').disabled = true;
+            document.getElementById('stop-training-btn').disabled = false;
+            document.getElementById('system-uptime').textContent = 'Training';
+        } else {
+            document.getElementById('start-training-btn').disabled = false;
+            document.getElementById('stop-training-btn').disabled = true;
+            document.getElementById('system-uptime').textContent = status.initialized ? 'Ready' : 'Initializing';
+        }
+    }
+    
+    // Override the global updateSystemStatus function
+    window.updateSystemStatus = updateSystemStatus;
+</script>
+{% endblock %} 
