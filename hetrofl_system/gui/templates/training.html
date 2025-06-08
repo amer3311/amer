@@ -187,27 +187,47 @@
                         <h5 class="mb-3"><i class="fas fa-info-circle me-2"></i>Status & Progress</h5>
                         <div class="row g-3">
                             <div class="col-md-6">
-                                <div class="metric-card" style="background: linear-gradient(45deg, #4361ee, #4895ef);">
-                                    <div class="metric-value" id="training-status-value">Idle</div>
-                                    <div class="metric-label">Status</div>
+                                <div class="metric-card" style="background: var(--gradient-primary);">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div>
+                                            <div class="metric-value" id="training-status-value">Idle</div>
+                                            <div class="metric-label">Status</div>
+                                        </div>
+                                        <i class="fas fa-info-circle fa-2x opacity-50"></i>
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-md-6">
-                                <div class="metric-card" style="background: linear-gradient(45deg, #3a0ca3, #4361ee);">
-                                    <div class="metric-value" id="current-round">0</div>
-                                    <div class="metric-label">Current Round</div>
+                                <div class="metric-card" style="background: var(--gradient-secondary);">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div>
+                                            <div class="metric-value" id="current-round">0</div>
+                                            <div class="metric-label">Current Round</div>
+                                        </div>
+                                        <i class="fas fa-sync-alt fa-2x opacity-50"></i>
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-md-6">
-                                <div class="metric-card" style="background: linear-gradient(45deg, #7209b7, #f72585);">
-                                    <div class="metric-value" id="elapsed-time">00:00:00</div>
-                                    <div class="metric-label">Elapsed Time</div>
+                                <div class="metric-card" style="background: var(--gradient-warning);">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div>
+                                            <div class="metric-value" id="elapsed-time">00:00:00</div>
+                                            <div class="metric-label">Elapsed Time</div>
+                                        </div>
+                                        <i class="fas fa-clock fa-2x opacity-50"></i>
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-md-6">
-                                <div class="metric-card" style="background: linear-gradient(45deg, #4cc9f0, #56cfe1);">
-                                    <div class="metric-value" id="active-models">0</div>
-                                    <div class="metric-label">Active Models</div>
+                                <div class="metric-card" style="background: var(--gradient-info);">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div>
+                                            <div class="metric-value" id="active-models">0</div>
+                                            <div class="metric-label">Active Models</div>
+                                        </div>
+                                        <i class="fas fa-network-wired fa-2x opacity-50"></i>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -270,27 +290,47 @@
             <div class="card-body">
                 <div class="row g-3">
                     <div class="col-6">
-                        <div class="metric-card" style="background: linear-gradient(45deg, #4361ee, #4895ef);">
-                            <div class="metric-value" id="best-accuracy">0.00%</div>
-                            <div class="metric-label">Best Accuracy</div>
+                        <div class="metric-card" style="background: var(--gradient-success);">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <div class="metric-value" id="best-accuracy">0.00%</div>
+                                    <div class="metric-label">Best Accuracy</div>
+                                </div>
+                                <i class="fas fa-trophy fa-lg opacity-50"></i>
+                            </div>
                         </div>
                     </div>
                     <div class="col-6">
-                        <div class="metric-card" style="background: linear-gradient(45deg, #3a0ca3, #4361ee);">
-                            <div class="metric-value" id="best-f1">0.00%</div>
-                            <div class="metric-label">Best F1 Score</div>
+                        <div class="metric-card" style="background: var(--gradient-primary);">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <div class="metric-value" id="best-f1">0.00%</div>
+                                    <div class="metric-label">Best F1 Score</div>
+                                </div>
+                                <i class="fas fa-medal fa-lg opacity-50"></i>
+                            </div>
                         </div>
                     </div>
                     <div class="col-6">
-                        <div class="metric-card" style="background: linear-gradient(45deg, #7209b7, #f72585);">
-                            <div class="metric-value" id="current-loss">0.00</div>
-                            <div class="metric-label">Current Loss</div>
+                        <div class="metric-card" style="background: var(--gradient-danger);">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <div class="metric-value" id="current-loss">0.00</div>
+                                    <div class="metric-label">Current Loss</div>
+                                </div>
+                                <i class="fas fa-chart-line-down fa-lg opacity-50"></i>
+                            </div>
                         </div>
                     </div>
                     <div class="col-6">
-                        <div class="metric-card" style="background: linear-gradient(45deg, #4cc9f0, #56cfe1);">
-                            <div class="metric-value" id="avg-round-time">0s</div>
-                            <div class="metric-label">Avg Round Time</div>
+                        <div class="metric-card" style="background: var(--gradient-info);">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <div class="metric-value" id="avg-round-time">0s</div>
+                                    <div class="metric-label">Avg Round Time</div>
+                                </div>
+                                <i class="fas fa-stopwatch fa-lg opacity-50"></i>
+                            </div>
                         </div>
                     </div>
                 </div>

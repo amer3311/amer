@@ -135,6 +135,21 @@ def metrics():
     """Metrics and analytics page."""
     return render_template('metrics.html')
 
+@app.route('/map')
+def device_map():
+    """Interactive map showing local model locations."""
+    return render_template('map.html')
+
+@app.route('/about')
+def about():
+    """About page with animated FL diagram."""
+    return render_template('about.html')
+
+@app.route('/help')
+def help_page():
+    """Help and documentation page."""
+    return render_template('help.html')
+
 @app.route('/api/status')
 def get_status():
     """Get system status."""
