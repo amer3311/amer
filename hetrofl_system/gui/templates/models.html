@@ -24,7 +24,7 @@
     <div class="row mb-4">
         <div class="col-12">
             <div class="card">
-                <div class="card-header bg-primary text-white">
+                <div class="card-header" style="background: var(--gradient-primary);">
                     <h5 class="mb-0"><i class="fas fa-globe me-2"></i>Global Neural Network Model</h5>
                 </div>
                 <div class="card-body">
@@ -70,7 +70,7 @@
     <div class="row mb-4">
         <div class="col-12">
             <div class="card">
-                <div class="card-header bg-info text-white">
+                <div class="card-header" style="background: var(--gradient-secondary);">
                     <h5 class="mb-0"><i class="fas fa-laptop me-2"></i>Local Models</h5>
                 </div>
                 <div class="card-body">
@@ -91,7 +91,7 @@
     <div class="row mb-4">
         <div class="col-12">
             <div class="card">
-                <div class="card-header bg-secondary text-white">
+                <div class="card-header" style="background: var(--gradient-info);">
                     <h5 class="mb-0"><i class="fas fa-sitemap me-2"></i>Model Architecture</h5>
                 </div>
                 <div class="card-body">
@@ -137,7 +137,7 @@
     <div class="row">
         <div class="col-12">
             <div class="card">
-                <div class="card-header bg-success text-white">
+                <div class="card-header" style="background: var(--gradient-success);">
                     <h5 class="mb-0"><i class="fas fa-chart-pie me-2"></i>Performance Summary</h5>
                 </div>
                 <div class="card-body">
@@ -341,11 +341,14 @@ function updateLocalModelsDisplay(localModels) {
         
         col.innerHTML = `
             <div class="card h-100">
-                <div class="card-header bg-${statusClass} text-white">
-                    <h6 class="mb-0">
-                        <i class="fas fa-${getModelIcon(modelName)} me-2"></i>
-                        ${modelName}
-                    </h6>
+                <div class="card-header" style="background: var(--gradient-${statusClass === 'success' ? 'success' : 'warning'});">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h6 class="mb-0">
+                            <i class="fas fa-${getModelIcon(modelName)} me-2"></i>
+                            ${modelName}
+                        </h6>
+                        <span class="status-indicator ${isLoaded ? 'status-online' : 'status-offline'}"></span>
+                    </div>
                 </div>
                 <div class="card-body">
                     <div class="mb-2">

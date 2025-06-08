@@ -19,33 +19,81 @@
                 <div class="row">
                     <!-- Global Model Status -->
                     <div class="col-md-3">
-                        <div class="metric-card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
-                            <div class="metric-value" id="global-accuracy">--</div>
-                            <div class="metric-label">Global Model Accuracy</div>
+                        <div class="metric-card" style="background: var(--gradient-primary);">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <div class="metric-value" id="global-accuracy">--</div>
+                                    <div class="metric-label">Global Model Accuracy</div>
+                                </div>
+                                <div class="metric-icon">
+                                    <i class="fas fa-brain fa-2x opacity-50"></i>
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <div id="accuracy-sparkline" style="height: 40px;"></div>
+                            </div>
                         </div>
                     </div>
                     
                     <!-- Training Progress -->
                     <div class="col-md-3">
-                        <div class="metric-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
-                            <div class="metric-value" id="training-round">--</div>
-                            <div class="metric-label">Current Round</div>
+                        <div class="metric-card" style="background: var(--gradient-secondary);">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <div class="metric-value" id="training-round">--</div>
+                                    <div class="metric-label">Current Round</div>
+                                </div>
+                                <div class="metric-icon">
+                                    <i class="fas fa-sync-alt fa-2x opacity-50"></i>
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <div class="progress" style="height: 6px;">
+                                    <div class="progress-bar bg-white" id="round-progress" style="width: 0%;"></div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     
                     <!-- Local Models -->
                     <div class="col-md-3">
-                        <div class="metric-card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
-                            <div class="metric-value" id="local-models-count">--</div>
-                            <div class="metric-label">Local Models</div>
+                        <div class="metric-card" style="background: var(--gradient-success);">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <div class="metric-value" id="local-models-count">--</div>
+                                    <div class="metric-label">Local Models</div>
+                                </div>
+                                <div class="metric-icon">
+                                    <i class="fas fa-network-wired fa-2x opacity-50"></i>
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <div class="d-flex justify-content-between">
+                                    <small class="opacity-75">Active: <span id="active-models">0</span></small>
+                                    <small class="opacity-75">Ready: <span id="ready-models">0</span></small>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     
                     <!-- System Status -->
                     <div class="col-md-3">
-                        <div class="metric-card" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
-                            <div class="metric-value" id="system-uptime">--</div>
-                            <div class="metric-label">System Status</div>
+                        <div class="metric-card" style="background: var(--gradient-info);">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <div class="metric-value" id="system-uptime">--</div>
+                                    <div class="metric-label">System Status</div>
+                                </div>
+                                <div class="metric-icon">
+                                    <i class="fas fa-server fa-2x opacity-50"></i>
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <div class="d-flex align-items-center">
+                                    <span class="status-indicator me-2" id="dashboard-status"></span>
+                                    <small class="opacity-75" id="status-detail">Initializing...</small>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -228,6 +276,9 @@
     
     // Initialize charts with proper error handling
     function initializeCharts() {
+        // Initialize sparkline chart
+        initializeSparkline();
+        
         // Performance chart
         const performanceLayout = {
             title: 'Real-time Performance',
@@ -235,7 +286,10 @@
             yaxis: { title: 'Accuracy (%)' },
             autosize: true,
             margin: { l: 50, r: 50, t: 50, b: 50 },
-            showlegend: true
+            showlegend: true,
+            plot_bgcolor: 'rgba(0,0,0,0)',
+            paper_bgcolor: 'rgba(0,0,0,0)',
+            font: { color: chartTheme === 'dark' ? '#e5e7eb' : '#1e293b' }
         };
         
         const emptyTrace = [{
@@ -244,7 +298,7 @@
             type: 'scatter',
             mode: 'lines+markers',
             name: 'Waiting for data...',
-            line: { color: '#3498db' }
+            line: { color: '#4f46e5' }
         }];
         
         Plotly.newPlot('performance-chart', emptyTrace, performanceLayout);
@@ -255,7 +309,10 @@
             xaxis: { title: 'Models' },
             yaxis: { title: 'Accuracy (%)' },
             autosize: true,
-            margin: { l: 50, r: 50, t: 50, b: 50 }
+            margin: { l: 50, r: 50, t: 50, b: 50 },
+            plot_bgcolor: 'rgba(0,0,0,0)',
+            paper_bgcolor: 'rgba(0,0,0,0)',
+            font: { color: chartTheme === 'dark' ? '#e5e7eb' : '#1e293b' }
         };
         
         const emptyBarTrace = [{
@@ -263,10 +320,41 @@
             y: [0],
             type: 'bar',
             name: 'Accuracy',
-            marker: { color: '#3498db' }
+            marker: { color: '#4f46e5' }
         }];
         
         Plotly.newPlot('comparison-chart', emptyBarTrace, comparisonLayout);
+    }
+    
+    // Initialize sparkline chart
+    function initializeSparkline() {
+        const sparklineData = Array.from({length: 10}, (_, i) => Math.random() * 20 + 70);
+        
+        const trace = {
+            x: Array.from({length: 10}, (_, i) => i + 1),
+            y: sparklineData,
+            type: 'scatter',
+            mode: 'lines',
+            line: { color: 'rgba(255,255,255,0.8)', width: 2 },
+            fill: 'tonexty',
+            fillcolor: 'rgba(255,255,255,0.1)',
+            showlegend: false,
+            hoverinfo: 'none'
+        };
+        
+        const layout = {
+            margin: { l: 0, r: 0, t: 0, b: 0 },
+            xaxis: { visible: false },
+            yaxis: { visible: false },
+            plot_bgcolor: 'rgba(0,0,0,0)',
+            paper_bgcolor: 'rgba(0,0,0,0)',
+            autosize: true
+        };
+        
+        Plotly.newPlot('accuracy-sparkline', [trace], layout, {
+            displayModeBar: false,
+            responsive: true
+        });
     }
     
     // Load initial data
@@ -690,10 +778,37 @@
             document.getElementById('start-training-btn').disabled = true;
             document.getElementById('stop-training-btn').disabled = false;
             document.getElementById('system-uptime').textContent = 'Training';
+            
+            // Update round progress
+            if (status.current_round && status.total_rounds) {
+                const progress = (status.current_round / status.total_rounds) * 100;
+                document.getElementById('round-progress').style.width = progress + '%';
+            }
         } else {
             document.getElementById('start-training-btn').disabled = false;
             document.getElementById('stop-training-btn').disabled = true;
             document.getElementById('system-uptime').textContent = status.initialized ? 'Ready' : 'Initializing';
+            document.getElementById('round-progress').style.width = '0%';
+        }
+        
+        // Update dashboard status indicator
+        const dashboardStatus = document.getElementById('dashboard-status');
+        const statusDetail = document.getElementById('status-detail');
+        
+        if (dashboardStatus && statusDetail) {
+            if (status.error) {
+                dashboardStatus.className = 'status-indicator status-offline me-2';
+                statusDetail.textContent = 'Error: ' + status.error;
+            } else if (status.training) {
+                dashboardStatus.className = 'status-indicator status-training pulse me-2';
+                statusDetail.textContent = `Training Round ${status.current_round || 0}`;
+            } else if (status.initialized) {
+                dashboardStatus.className = 'status-indicator status-online me-2';
+                statusDetail.textContent = 'System Ready';
+            } else {
+                dashboardStatus.className = 'status-indicator status-offline me-2';
+                statusDetail.textContent = 'Initializing...';
+            }
         }
     }
     
